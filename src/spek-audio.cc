@@ -260,7 +260,6 @@ int AudioFileImpl::read()
     for (;;) {
         while (this->packet.size > 0) {
             av_frame_unref(this->frame);
-            int got_frame = 0;
             int len = 0;
             int ret = avcodec_send_packet(this->codec_context,&this->packet);
             if (ret < 0) {
@@ -276,11 +275,6 @@ int AudioFileImpl::read()
             this->packet.data += len;
             this->packet.size -= len;
             this->offset += len;
-            if (!got_frame) {
-                // No data yet, get more frames.
-                continue;
-            }
-            // We have data, return it and come back for more later.
             int samples = this->frame->nb_samples;
             if (samples > this->buffer_len) {
                 this->buffer = static_cast<float*>(
