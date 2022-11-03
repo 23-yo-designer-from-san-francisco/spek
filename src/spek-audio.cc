@@ -103,7 +103,7 @@ std::unique_ptr<AudioFile> Audio::open(const std::string& file_name, int stream)
 
     AVStream *avstream = nullptr;
     AVCodecParameters *codecpar = nullptr;
-    AVCodec *codec = nullptr;
+    const AVCodec *codec = nullptr;
     if (!error) {
         avstream = format_context->streams[audio_stream];
         codecpar = avstream->codecpar;
@@ -261,12 +261,17 @@ int AudioFileImpl::read()
         while (this->packet.size > 0) {
             av_frame_unref(this->frame);
             int got_frame = 0;
-            int len = avcodec_decode_audio4(
-                this->codec_context, this->frame, &got_frame, &this->packet
-            );
-            if (len < 0) {
-                // Error, skip the frame.
+            int len = 0;
+            int ret = avcodec_send_packet(this->codec_context,&this->packet);
+            if (ret < 0) {
                 break;
+            }
+            ret = avcodec_receive_frame(this->codec_context,this->frame);
+            if (ret < 0 && ret != AVERROR(EAGAIN) && ret != AVERROR_EOF) {
+                break;
+            }
+            else {
+                len = this->packet.size;
             }
             this->packet.data += len;
             this->packet.size -= len;

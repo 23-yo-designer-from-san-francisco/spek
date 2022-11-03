@@ -3,11 +3,12 @@ AC_CONFIG_SRCDIR([src/spek.cc])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([1.11.1 foreign no-dist-gzip dist-xz serial-tests])
 AM_SILENT_RULES([yes])
+AC_CONFIG_MACRO_DIRS([/opt/homebrew/Cellar/wxwidgets/3.2.1/share/wx/3.2/aclocal])
 
 AC_LANG([C++])
 AM_PROG_AR
 AC_PROG_CXX
-CXXFLAGS="$CXXFLAGS -std=gnu++11 -Wall -Wextra"
+CXXFLAGS="$CXXFLAGS -std=gnu++11 -Wall -Wextra -I/opt/homebrew/include/"
 AC_PROG_CXXCPP
 AC_PROG_LIBTOOL
 AC_PROG_RANLIB
